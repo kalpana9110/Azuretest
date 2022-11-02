@@ -17,17 +17,18 @@
 			"scriptLines": [
 				"source(output(",
 				"          {_Col_0} as string,",
-				"          {_Col_1} as string,",
-				"          {_Col_2} as string,",
-				"          {_Col_3} as string,",
-				"          {_Col_4} as double,",
-				"          {_Col_5} as string,",
-				"          {_Col_6} as double,",
-				"          {_Col_7} as string",
+				"          Column_2 as string,",
+				"          Column_3 as string,",
+				"          Column_4 as string,",
+				"          Column_5 as string,",
+				"          Column_6 as string,",
+				"          Column_7 as string,",
+				"          Column_8 as string",
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
+				"     skipLines: 2,",
 				"     maxColumns: 9) ~> Campaignsource"
 			]
 		}
