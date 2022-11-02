@@ -1,0 +1,34 @@
+{
+	"name": "Finaltest",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Campaigntest",
+						"type": "DatasetReference"
+					},
+					"name": "Compaignsource"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          {_Col_0} as string,",
+				"          {_Col_1} as string,",
+				"          {_Col_2} as string,",
+				"          {_Col_3} as string,",
+				"          {_Col_4} as string,",
+				"          {_Col_5} as double,",
+				"          {_Col_6} as string,",
+				"          {_Col_7} as double",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> Compaignsource"
+			]
+		}
+	}
+}
