@@ -1,0 +1,266 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name"
+		},
+		"Finaltestcompaign": {
+			"type": "string"
+		},
+		"AzureSqlDatabaselonkedservice": {
+			"type": "string"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline_campaign')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Dataflow_Campaign",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "Finaltest",
+								"type": "DataFlowReference"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/Finaltest')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Finaltest')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Campaigntest",
+								"type": "DatasetReference"
+							},
+							"name": "Compaignsource"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Campaigntarget",
+								"type": "DatasetReference"
+							},
+							"name": "Targettable"
+						}
+					],
+					"transformations": [
+						{
+							"name": "MapCampaignAnalytics"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "removecolumns"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          {_Col_0} as string,",
+						"          {_Col_1} as string,",
+						"          {_Col_2} as string,",
+						"          {_Col_3} as string,",
+						"          {_Col_4} as string,",
+						"          {_Col_5} as double,",
+						"          {_Col_6} as string,",
+						"          {_Col_7} as double",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> Compaignsource",
+						"Compaignsource select(mapColumn(",
+						"          Region = {_Col_0},",
+						"          Country = {_Col_1},",
+						"          ProductCategory = {_Col_2},",
+						"          CampaignName = {_Col_3},",
+						"          RevenuePart1 = {_Col_4},",
+						"          Revenue = {_Col_5},",
+						"          RevenueTargetPart1 = {_Col_6},",
+						"          RevenueTarget = {_Col_7}",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> MapCampaignAnalytics",
+						"MapCampaignAnalytics derive(Revenue = toDecimal(replace(concat(toString(RevenuePart1), toString(Revenue)), '\\\\', ''), 10, 2, '$###,###.##'),",
+						"          RevenueTarget = toDecimal(replace(concat(toString(RevenueTargetPart1), toString(RevenueTarget)), '\\\\', ''), 10, 2, '$###,###.##')) ~> derivedColumn1",
+						"derivedColumn1 select(mapColumn(",
+						"          Region,",
+						"          Country,",
+						"          ProductCategory,",
+						"          CampaignName,",
+						"          Revenue,",
+						"          RevenueTarget",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> removecolumns",
+						"removecolumns sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          Region as string,",
+						"          Country as string,",
+						"          ProductCategory as string,",
+						"          CampaignName as string,",
+						"          Revenue as decimal(10,2),",
+						"          RevenueTarget as decimal(10,2),",
+						"          City as string,",
+						"          State as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> Targettable"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Campaigntest')]",
+				"[concat(variables('factoryId'), '/datasets/Campaigntarget')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Campaigntest')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('Finaltestcompaign')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "campaignanalytics.csv",
+						"fileSystem": "data"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Campaigntarget')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "[parameters('AzureSqlDatabaselonkedservice')]",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Region",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Country",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ProductCategory",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CampaignName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Revenue",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "RevenueTarget",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "City",
+						"type": "nvarchar"
+					},
+					{
+						"name": "State",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "CampaignAnalytics"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
