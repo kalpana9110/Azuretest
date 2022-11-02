@@ -13,7 +13,14 @@
 				}
 			],
 			"sinks": [],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "MapCampaignAnalytics"
+				},
+				{
+					"name": "derivedColumn1"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          {_Col_0} as string,",
@@ -27,7 +34,21 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> Compaignsource"
+				"     ignoreNoFilesFound: false) ~> Compaignsource",
+				"Compaignsource select(mapColumn(",
+				"          Region = {_Col_0},",
+				"          Country = {_Col_1},",
+				"          ProductCategory = {_Col_2},",
+				"          CampaignName = {_Col_3},",
+				"          RevenuePart1 = {_Col_4},",
+				"          Revenue = {_Col_5},",
+				"          RevenueTargetPart1 = {_Col_6},",
+				"          RevenueTarget = {_Col_7}",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> MapCampaignAnalytics",
+				"MapCampaignAnalytics derive(Revenue = toDecimal(replace(concat(toString(RevenuePart1), toString(Revenue)), '\\\\', ''), 10, 2, '$###,###.##'),",
+				"          RevenueTarget = toDecimal(replace(concat(toString(RevenueTargetPart1), toString(RevenueTarget)), '\\\\', ''), 10, 2, '$###,###.##')) ~> derivedColumn1"
 			]
 		}
 	}
