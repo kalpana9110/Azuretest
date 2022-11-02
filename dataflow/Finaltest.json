@@ -12,13 +12,24 @@
 					"name": "Compaignsource"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Campaigntarget",
+						"type": "DatasetReference"
+					},
+					"name": "Targettable"
+				}
+			],
 			"transformations": [
 				{
 					"name": "MapCampaignAnalytics"
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "removecolumns"
 				}
 			],
 			"scriptLines": [
@@ -48,7 +59,37 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> MapCampaignAnalytics",
 				"MapCampaignAnalytics derive(Revenue = toDecimal(replace(concat(toString(RevenuePart1), toString(Revenue)), '\\\\', ''), 10, 2, '$###,###.##'),",
-				"          RevenueTarget = toDecimal(replace(concat(toString(RevenueTargetPart1), toString(RevenueTarget)), '\\\\', ''), 10, 2, '$###,###.##')) ~> derivedColumn1"
+				"          RevenueTarget = toDecimal(replace(concat(toString(RevenueTargetPart1), toString(RevenueTarget)), '\\\\', ''), 10, 2, '$###,###.##')) ~> derivedColumn1",
+				"derivedColumn1 select(mapColumn(",
+				"          Region,",
+				"          Country,",
+				"          ProductCategory,",
+				"          CampaignName,",
+				"          Revenue,",
+				"          RevenueTarget",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> removecolumns",
+				"removecolumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Region as string,",
+				"          Country as string,",
+				"          ProductCategory as string,",
+				"          CampaignName as string,",
+				"          Revenue as decimal(10,2),",
+				"          RevenueTarget as decimal(10,2),",
+				"          City as string,",
+				"          State as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> Targettable"
 			]
 		}
 	}
