@@ -1,0 +1,9 @@
+{
+	"name": "ADFcampaign",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "a05b4b37-2b52-4264-95b9-ba0f99903847",
+		"tenantId": "9801b826-bb84-4082-837f-e88bca62097c"
+	}
+}
