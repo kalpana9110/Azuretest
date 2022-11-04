@@ -5,10 +5,10 @@
 		"factoryName": {
 			"value": "ADFcampaign"
 		},
-		"Finaltestcompaign_accountKey": {
+		"AzureSqlDatabaselonkedservice_connectionString": {
 			"value": ""
 		},
-		"AzureSqlDatabaselonkedservice_connectionString": {
+		"Finaltestcompaign_accountKey": {
 			"value": ""
 		},
 		"Finaltestcompaign_properties_typeProperties_url": {

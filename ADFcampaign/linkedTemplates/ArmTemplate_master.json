@@ -7,13 +7,13 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ADFcampaign"
 		},
-		"Finaltestcompaign_accountKey": {
-			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'Finaltestcompaign'"
-		},
 		"AzureSqlDatabaselonkedservice_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabaselonkedservice'"
+		},
+		"Finaltestcompaign_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'Finaltestcompaign'"
 		},
 		"Finaltestcompaign_properties_typeProperties_url": {
 			"type": "string",
@@ -46,11 +46,11 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"Finaltestcompaign_accountKey": {
-						"value": "[parameters('Finaltestcompaign_accountKey')]"
-					},
 					"AzureSqlDatabaselonkedservice_connectionString": {
 						"value": "[parameters('AzureSqlDatabaselonkedservice_connectionString')]"
+					},
+					"Finaltestcompaign_accountKey": {
+						"value": "[parameters('Finaltestcompaign_accountKey')]"
 					},
 					"Finaltestcompaign_properties_typeProperties_url": {
 						"value": "[parameters('Finaltestcompaign_properties_typeProperties_url')]"
